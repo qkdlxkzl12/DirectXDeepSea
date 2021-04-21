@@ -1,0 +1,9 @@
+﻿  DeepSea.cpp
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(84,37): warning C4458: 'texture' 선언은 클래스 멤버를 숨깁니다.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(52,21): message : 'OBJECT::texture' 선언을 참조하십시오.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(91,16): warning C4244: 'return': 'float'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(96,16): warning C4244: 'return': 'float'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(237,22): warning C4458: 'type' 선언은 클래스 멤버를 숨깁니다.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(199,7): message : 'BULLET::type' 선언을 참조하십시오.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(288,27): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  DeepSea_2010.vcxproj -> C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\Debug\DeepSea.exe
