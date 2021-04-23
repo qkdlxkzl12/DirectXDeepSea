@@ -2,6 +2,7 @@
 #include <d3dx9.h>
 #pragma warning( disable : 4996 ) // disable deprecated warning 
 #include <strsafe.h>
+#include <coroutine>
 #pragma warning( default : 4996 )
 #define KEY_DOWN(vk_code) ((GetAsyncKeyState(vk_code) & 0x8000) ? 1 : 0)
 #define KEY_UP(vk_code)       ((GetAsyncKeyState(vk_code) & 0x8000) ? 0 : 1)
@@ -39,6 +40,7 @@ public:
 		oldTime = g_curTime;
 		return TRUE;
 	}
+
 };
 
 class OBJECT {
@@ -100,6 +102,8 @@ public:
 class ACTOR : public OBJECT
 {
 private:
+	INT a1 = 1;
+	INT a2 = 0;
 	INT maxHealth;
 	INT currentHealth;
 	INT moveSpeed;
@@ -150,10 +154,17 @@ public:
 	VOID GetDamage(INT damage)
 	{
 		currentHealth -= damage;
-		color = 0xffaa0000;
-		
+		a1 = 100;
+		a2 = g_curTime;
 	}
-
+	VOID ChangeColor()
+	{
+		color = 0xffffffff; 
+		if (g_curTime - a2 < a1)
+		{
+			color = 0xffaa0000;
+		}
+	}
 	VOID OnDie()
 	{
 
@@ -211,34 +222,11 @@ public:
 		isFired = FALSE;
 	}
 
-	VOID SetStartPos(D3DXVECTOR3 vector3)
-	{
-		startPos = vector3;
-	}
-
-	VOID Init( )
-	{
-		pos = startPos;
-		isFired = TRUE;
-	}
-
-	VOID Fired()
-	{
-		if (!isFired)
-			return;
-		pos.x += moveSpeed;
-		if (pos.x - GetHalfWidth() > SCREEN_WIDTH)
-		{
-			isFired = FALSE;
-			visible = FALSE;
-		}
-	}
-
-	VOID ChangeType(INT type)
-	{
-		BULLET::type = type;
-		rect = { 100,10 * type,110,10 * type + 6 };
-	}
+	VOID SetStartPos(D3DXVECTOR3 vector3);
+	VOID Init();
+	VOID Fired();
+	VOID ChangeType(INT type);
+	VOID Outed();
 };
 
 class PLAYER : public ACTOR
@@ -260,61 +248,157 @@ public:
 		tChangeT = TIME(1000);
 	}
 
-	VOID Control()
-	{
-		if (KEY_DOWN(VK_LEFT))
-			if(pos.x - GetHalfWidth() > 0)
-			MoveLeft();
-		if (KEY_DOWN(VK_RIGHT))
-			if (pos.x + GetHalfWidth() < SCREEN_WIDTH)
-			MoveRight();
-		if (KEY_DOWN(VK_UP))
-			if (pos.y - GetHalfHeight() > 0)
-			MoveUp();
-		if (KEY_DOWN(VK_DOWN))
-			if (pos.y + GetHalfHeight() < SCREEN_HEIGHT)
-			MoveDown();
-		if (KEY_DOWN(VK_SPACE))
-			ShotBullet();
-		if (KEY_DOWN(INT('X')))
-			ChangeAttackType();
-	}
-
-	VOID OutedBorder()
-	{
-		if (pos.x - GetHalfWidth() < -20)
-		{
-			GetDamage(10);
-			pos.x = GetHalfWidth() + 30;
-		}
-	}
-
-	VOID ShotBullet()
-	{
-		if(tFiring.IsEnoughPassed())
-		{ 
-			for (int i = 0; i < 100; i++)
-			{
-				if (bullet[i].visible)
-					continue;
-				bullet[i].visible = TRUE;
-				bullet[i].SetStartPos({ pos.x + bullet[i].GetHalfWidth() + GetHalfWidth() - 5, pos.y + bullet[i].GetHalfHeight() + 6 ,0 });
-				bullet[i].ChangeType(attackType);
-				bullet[i].Init();
-				break;
-			}
-		}
-	}
-
-	VOID ChangeAttackType()
-	{
-		if(tChangeT.IsEnoughPassed())
-		++attackType %= 4;
-	}
+	VOID Control();
+	VOID OutedBorder();
+	VOID ShotBullet();
+	VOID ChangeAttackType();
 	
+};
+
+class ENEMY : public ACTOR
+{
+public:
+	ENEMY(INT health, INT moveSpeed, INT startPosX, INT startPosY, INT width, INT height) : ACTOR(health, moveSpeed, startPosX, startPosY, width, height)
+	{
+
+	}
+	VOID HitWithBullet(BULLET* bullet);
+
 };
 
 VOID GameInit();
 VOID GameRender();
 VOID GameUpdate();
 VOID GameRelease();
+
+template<class C1, class C2>
+BOOL OnHit(C1 obj1, C2 obj2)
+{
+	return FALSE;
+}
+
+template<>
+BOOL OnHit<BULLET,ENEMY>(BULLET obj1, ENEMY obj2)
+{
+	INT L1 = obj1.pos.x - obj1.GetHalfWidth();
+	INT R1 = obj1.pos.x + obj1.GetHalfWidth();
+	INT L2 = obj2.pos.x - obj2.GetHalfWidth();
+	INT R2 = obj2.pos.x + obj2.GetHalfWidth();
+	if ((L1 - R2)*(L2 - R1) < 0) //왼점에서 오른점 뺀게 부호가 다르면 비충돌
+		return FALSE;
+	L1 = obj1.pos.y - obj1.GetHalfHeight();
+	R1 = obj1.pos.y + obj1.GetHalfHeight();
+	L2 = obj2.pos.y - obj2.GetHalfHeight();
+	R2 = obj2.pos.y + obj2.GetHalfHeight();
+	if ((L1 - R2) * (L2 - R1) < 0) //윗점에서 아랫점 뺀게 부호가 다르면 비충돌
+		return FALSE;
+	return TRUE;
+}
+
+
+// / BULLET FUNCTION / //
+VOID BULLET::SetStartPos(D3DXVECTOR3 vector3)
+{
+	startPos = vector3;
+}
+
+VOID BULLET::Init()
+{
+	pos = startPos;
+	isFired = TRUE;
+}
+
+VOID BULLET::Fired()
+{
+	if (!isFired)
+		return;
+	pos.x += moveSpeed;
+	if (pos.x - GetHalfWidth() > SCREEN_WIDTH)
+		Outed();
+}
+
+VOID BULLET::ChangeType(INT type)
+{
+	BULLET::type = type;
+	rect = { 100,10 * type,110,10 * type + 6 };
+}
+
+VOID BULLET::Outed()
+{
+	isFired = FALSE;
+	visible = FALSE;
+}
+
+
+// / PLAYER FUNCTION / //
+VOID PLAYER::Control()
+{
+	if (KEY_DOWN(VK_LEFT))
+		if (pos.x - GetHalfWidth() > 0)
+			MoveLeft();
+	if (KEY_DOWN(VK_RIGHT))
+		if (pos.x + GetHalfWidth() < SCREEN_WIDTH)
+			MoveRight();
+	if (KEY_DOWN(VK_UP))
+		if (pos.y - GetHalfHeight() > 0)
+			MoveUp();
+	if (KEY_DOWN(VK_DOWN))
+		if (pos.y + GetHalfHeight() < SCREEN_HEIGHT)
+			MoveDown();
+	if (KEY_DOWN(VK_SPACE))
+		ShotBullet();
+	if (KEY_DOWN(INT('X')))
+		ChangeAttackType();
+
+	ChangeColor();
+}
+
+VOID PLAYER::OutedBorder()
+{
+	if (pos.x - GetHalfWidth() < -20)
+	{
+		GetDamage(10);
+		pos.x = GetHalfWidth() + 30;
+	}
+}
+
+VOID PLAYER::ShotBullet()
+{
+	if (tFiring.IsEnoughPassed())
+	{
+		for (int i = 0; i < 100; i++)
+		{
+			if (bullet[i].visible)
+				continue;
+			bullet[i].visible = TRUE;
+			bullet[i].SetStartPos({ pos.x + bullet[i].GetHalfWidth() + GetHalfWidth() - 5, pos.y + bullet[i].GetHalfHeight() + 6 ,0 });
+			bullet[i].ChangeType(attackType);
+			bullet[i].Init();
+			break;
+		}
+	}
+}
+
+VOID PLAYER::ChangeAttackType()
+{
+	if (tChangeT.IsEnoughPassed())
+		++attackType %= 4;
+}
+
+
+// / ENEMY FUNCTION / //
+VOID ENEMY::HitWithBullet(BULLET* bullet)
+{
+	if (bullet->visible)
+		if (OnHit(bullet, this))
+		{
+			this->GetDamage(5);
+			bullet->Outed();
+		}
+	//if (bullet->visible == FALSE)
+	//	return;
+	//if (OnHit(&bullet, this) == FALSE)
+	//	return;
+	//this->GetDamage(5);
+	//bullet->Outed();
+}

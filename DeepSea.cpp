@@ -3,7 +3,7 @@
 BACKGROUND g_bgIngame[2][4] = { { BACKGROUND(), }, };
 
 PLAYER g_player = PLAYER(0, 0, 87, 34);
-
+ENEMY enemy = ENEMY(100,10,0,0,153, 83);
 HRESULT InitD3D( HWND hWnd )
 {
     // Create the D3D object, which is needed to create the D3DDevice.
@@ -157,6 +157,12 @@ VOID GameInit(){
         for (int i = 0; i < 100; i++)
             g_player.bullet[i].texture = g_player.bullet[0].texture;
     }
+    //Inite to Enemy 
+    {
+        OBJECT::LoadTexture(L"Resources/enemy1.png", &texture);
+        enemy.SetTexture(texture);
+        enemy.visible = true;
+    }
 }
 
 VOID GameRender(){
@@ -166,6 +172,7 @@ VOID GameRender(){
     g_player.Draw();
     for (int i = 0; i < 100; i++)
         g_player.bullet[i].Draw();
+    enemy.Draw();
 }
 
 VOID GameUpdate() {
@@ -177,9 +184,17 @@ VOID GameUpdate() {
     g_player.Control();
     g_player.OutedBorder();
     for (int i = 0; i < 100; i++)
+    {
         g_player.bullet[i].Fired();
+        if (g_player.bullet[i].visible)
+            if (OnHit(g_player.bullet[i], enemy))
+            {
+                enemy.GetDamage(5);
+                g_player.bullet[i].Outed();
+            }
+    }
+    enemy.ChangeColor();
 }
-
 VOID GameRelease() {
 
 }
