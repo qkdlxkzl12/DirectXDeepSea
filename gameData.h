@@ -79,13 +79,13 @@ public:
 	/// ////////////////////////////////////////////
 	VOID Draw()
 	{
-		if(visible)
-		g_pSprite->Draw(texture, &rect, &center, &pos, color);
+		if (visible)
+			g_pSprite->Draw(texture, &rect, &center, &pos, color);
 	}
 
 	VOID SetTexture(LPDIRECT3DTEXTURE9 texture)
 	{
-		OBJECT::texture = texture;
+		this->texture = texture;
 	}
 
 	INT GetHalfWidth()
@@ -96,6 +96,32 @@ public:
 	INT GetHalfHeight()
 	{
 		return center.y;
+	}
+};
+
+class ANIMATION
+{
+private:
+	INT animMaxCount;
+	INT animCount;
+	TIME tAnim;
+	OBJECT *obj;
+public:
+	ANIMATION(INT count, INT delday, OBJECT* obj) : animMaxCount(count), obj(obj)
+	{
+		animCount = 0;
+		tAnim = TIME(delday);
+	}
+
+	VOID PlayAnim()
+	{
+		if (tAnim.IsEnoughPassed())
+		{
+			int a = obj->rect.right - obj->rect.left;
+			obj->rect.left  = animCount * a;
+			obj->rect.right = (animCount + 1) * a;
+			++animCount %= animMaxCount;
+		}
 	}
 };
 
@@ -169,6 +195,7 @@ public:
 	{
 
 	}
+
 };
 
 class BACKGROUND : public OBJECT
@@ -263,7 +290,7 @@ public:
 
 	}
 	VOID HitWithBullet(BULLET* bullet);
-
+	ANIMATION moveAnim = ANIMATION(6,120,this);
 };
 
 VOID GameInit();
@@ -295,6 +322,23 @@ BOOL OnHit<BULLET,ENEMY>(BULLET obj1, ENEMY obj2)
 	return TRUE;
 }
 
+template<>
+BOOL OnHit<PLAYER, ENEMY>(PLAYER obj1, ENEMY obj2)
+{
+	INT L1 = obj1.pos.x - obj1.GetHalfWidth();
+	INT R1 = obj1.pos.x + obj1.GetHalfWidth();
+	INT L2 = obj2.pos.x - obj2.GetHalfWidth();
+	INT R2 = obj2.pos.x + obj2.GetHalfWidth();
+	if ((L1 - R2) * (L2 - R1) < 0) //왼점에서 오른점 뺀게 부호가 다르면 비충돌
+		return FALSE;
+	L1 = obj1.pos.y - obj1.GetHalfHeight();
+	R1 = obj1.pos.y + obj1.GetHalfHeight();
+	L2 = obj2.pos.y - obj2.GetHalfHeight();
+	R2 = obj2.pos.y + obj2.GetHalfHeight();
+	if ((L1 - R2) * (L2 - R1) < 0) //윗점에서 아랫점 뺀게 부호가 다르면 비충돌
+		return FALSE;
+	return TRUE;
+}
 
 // / BULLET FUNCTION / //
 VOID BULLET::SetStartPos(D3DXVECTOR3 vector3)

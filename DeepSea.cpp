@@ -3,7 +3,7 @@
 BACKGROUND g_bgIngame[2][4] = { { BACKGROUND(), }, };
 
 PLAYER g_player = PLAYER(0, 0, 87, 34);
-ENEMY enemy = ENEMY(100,10,0,0,153, 83);
+ENEMY enemy = ENEMY(100,10,0,0,152, 83);
 HRESULT InitD3D( HWND hWnd )
 {
     // Create the D3D object, which is needed to create the D3DDevice.
@@ -194,7 +194,9 @@ VOID GameUpdate() {
             }
     }
     enemy.ChangeColor();
+    enemy.moveAnim.PlayAnim();
 }
+
 VOID GameRelease() {
 
 }
