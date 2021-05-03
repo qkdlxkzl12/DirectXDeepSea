@@ -3,6 +3,9 @@
 #pragma warning( disable : 4996 ) // disable deprecated warning 
 #include <strsafe.h>
 #include <coroutine>
+#include <list>
+#include<cassert>
+#include<ctime>
 #pragma warning( default : 4996 )
 #define KEY_DOWN(vk_code) ((GetAsyncKeyState(vk_code) & 0x8000) ? 1 : 0)
 #define KEY_UP(vk_code)       ((GetAsyncKeyState(vk_code) & 0x8000) ? 0 : 1)
@@ -26,21 +29,24 @@ public:
 		oldTime = 0;
 		delay = 0;
 	}
-
 	TIME(INT delay)
 	{
 		oldTime = 0;
 		TIME::delay = delay;
 	}
 
-	BOOL IsEnoughPassed()
+	BOOL IsEnoughPassed(BOOL usedResetOldtime)
 	{
 		if (g_curTime - oldTime < delay)
 			return FALSE;
-		oldTime = g_curTime;
+		if (usedResetOldtime == TRUE)
+			InitOltime();
 		return TRUE;
 	}
-
+	VOID InitOltime()
+	{
+		oldTime = g_curTime;
+	}
 };
 
 class OBJECT {
@@ -66,7 +72,6 @@ public:
 		pos = { SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f, 0 };
 		color = 0xffffffff;
 	}
-
 	OBJECT(INT startPosX, INT startPosY, INT width, INT height) //생성자
 	{
 		visible = FALSE;
@@ -76,7 +81,6 @@ public:
 		pos = { SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f, 0 };
 		color = 0xffffffff;
 	}
-	/// ////////////////////////////////////////////
 	VOID Draw()
 	{
 		if (visible)
@@ -107,6 +111,8 @@ private:
 	TIME tAnim;
 	OBJECT *obj;
 public:
+	ANIMATION()
+	{	}
 	ANIMATION(INT count, INT delday, OBJECT* obj) : animMaxCount(count), obj(obj)
 	{
 		animCount = 0;
@@ -115,21 +121,19 @@ public:
 
 	VOID PlayAnim()
 	{
-		if (tAnim.IsEnoughPassed())
-		{
-			int a = obj->rect.right - obj->rect.left;
-			obj->rect.left  = animCount * a;
-			obj->rect.right = (animCount + 1) * a;
-			++animCount %= animMaxCount;
-		}
+		if (tAnim.IsEnoughPassed(TRUE) == FALSE)
+			return;
+		int a = obj->rect.right - obj->rect.left;
+		obj->rect.left = animCount * a;
+		obj->rect.right = (animCount + 1) * a;
+		++animCount %= animMaxCount;
 	}
 };
 
 class ACTOR : public OBJECT
 {
 private:
-	INT a1 = 1;
-	INT a2 = 0;
+	TIME tOnHit;
 	INT maxHealth;
 	INT currentHealth;
 	INT moveSpeed;
@@ -140,6 +144,7 @@ public:
 		maxHealth = 1;
 		currentHealth = maxHealth;
 		moveSpeed = 1;
+		tOnHit = TIME(60);
 	}
 
 	ACTOR(INT health,INT moveSpeed, INT startPosX, INT startPosY, INT width, INT height) : OBJECT( startPosX,  startPosY,  width,  height)
@@ -147,6 +152,7 @@ public:
 		maxHealth = health;
 		currentHealth = maxHealth;
 		ACTOR::moveSpeed = moveSpeed;
+		tOnHit = TIME(60);
 	}
 
 
@@ -167,6 +173,23 @@ public:
 		pos.y += moveSpeed;
 	}
 
+	VOID MoveLeft(INT value)
+	{
+		pos.x -= value;
+	}
+	VOID MoveRight(INT value)
+	{
+		pos.x += value;
+	}
+	VOID MoveUp(INT value)
+	{
+		pos.y -= value;
+	}
+	VOID MoveDown(INT value)
+	{
+		pos.y += value;
+	}
+
 	INT GetHealth()
 	{
 		return currentHealth;
@@ -180,20 +203,19 @@ public:
 	VOID GetDamage(INT damage)
 	{
 		currentHealth -= damage;
-		a1 = 100;
-		a2 = g_curTime;
+		tOnHit.InitOltime();
+		
 	}
+
 	VOID ChangeColor()
 	{
 		color = 0xffffffff; 
-		if (g_curTime - a2 < a1)
-		{
+		if (tOnHit.IsEnoughPassed(FALSE) == FALSE)
 			color = 0xffaa0000;
-		}
 	}
 	VOID OnDie()
 	{
-
+		
 	}
 
 };
@@ -285,12 +307,40 @@ public:
 class ENEMY : public ACTOR
 {
 public:
+	ENEMY() {};
 	ENEMY(INT health, INT moveSpeed, INT startPosX, INT startPosY, INT width, INT height) : ACTOR(health, moveSpeed, startPosX, startPosY, width, height)
 	{
 
 	}
+
+	ANIMATION moveAnim;
+	virtual VOID Move() = 0;
+};
+
+class ENEMY1 : public ENEMY
+{
+private:
+
+public:
+	VOID Init();
+	ENEMY1(INT health, INT moveSpeed, INT startPosX, INT startPosY, INT width, INT height) : ENEMY(health, moveSpeed, startPosX, startPosY, width, height) 
+	{
+	moveAnim = ANIMATION(6, 100, this);
+	};
 	VOID HitWithBullet(BULLET* bullet);
-	ANIMATION moveAnim = ANIMATION(6,120,this);
+	VOID Move() override;
+
+};
+
+class ENEMY2 : public ENEMY
+{
+public :
+	ENEMY2(INT health, INT moveSpeed, INT startPosX, INT startPosY, INT width, INT height) : ENEMY(health, moveSpeed, startPosX, startPosY, width, height) 
+	{
+		moveAnim = ANIMATION(4, 70, this);
+	};
+	VOID Move() override;
+
 };
 
 VOID GameInit();
@@ -301,16 +351,28 @@ VOID GameRelease();
 template<class C1, class C2>
 BOOL OnHit(C1 obj1, C2 obj2)
 {
+	//FLOAT L1 = obj1.pos.x - obj1.GetHalfWidth();
+	//FLOAT R1 = obj1.pos.x + obj1.GetHalfWidth();
+	//FLOAT L2 = obj2.pos.x - obj2.GetHalfWidth();
+	//FLOAT R2 = obj2.pos.x + obj2.GetHalfWidth();
+	//if ((L1 - R2)*(L2 - R1) < 0) //왼점에서 오른점 뺀게 부호가 다르면 비충돌
+	//	return FALSE;
+	//L1 = obj1.pos.y - obj1.GetHalfHeight();
+	//R1 = obj1.pos.y + obj1.GetHalfHeight();
+	//L2 = obj2.pos.y - obj2.GetHalfHeight();
+	//R2 = obj2.pos.y + obj2.GetHalfHeight();
+	//if ((L1 - R2) * (L2 - R1) < 0) //윗점에서 아랫점 뺀게 부호가 다르면 비충돌
+	//	return FALSE;
+	//return TRUE;
 	return FALSE;
 }
-
 template<>
-BOOL OnHit<BULLET,ENEMY>(BULLET obj1, ENEMY obj2)
+BOOL OnHit<BULLET,ENEMY1>(BULLET obj1, ENEMY1 obj2)
 {
-	INT L1 = obj1.pos.x - obj1.GetHalfWidth();
-	INT R1 = obj1.pos.x + obj1.GetHalfWidth();
-	INT L2 = obj2.pos.x - obj2.GetHalfWidth();
-	INT R2 = obj2.pos.x + obj2.GetHalfWidth();
+	FLOAT L1 = obj1.pos.x - obj1.GetHalfWidth();
+	FLOAT R1 = obj1.pos.x + obj1.GetHalfWidth();
+	FLOAT L2 = obj2.pos.x - obj2.GetHalfWidth();
+	FLOAT R2 = obj2.pos.x + obj2.GetHalfWidth();
 	if ((L1 - R2)*(L2 - R1) < 0) //왼점에서 오른점 뺀게 부호가 다르면 비충돌
 		return FALSE;
 	L1 = obj1.pos.y - obj1.GetHalfHeight();
@@ -321,14 +383,13 @@ BOOL OnHit<BULLET,ENEMY>(BULLET obj1, ENEMY obj2)
 		return FALSE;
 	return TRUE;
 }
-
 template<>
-BOOL OnHit<PLAYER, ENEMY>(PLAYER obj1, ENEMY obj2)
+BOOL OnHit<PLAYER, ENEMY1>(PLAYER obj1, ENEMY1 obj2)
 {
-	INT L1 = obj1.pos.x - obj1.GetHalfWidth();
-	INT R1 = obj1.pos.x + obj1.GetHalfWidth();
-	INT L2 = obj2.pos.x - obj2.GetHalfWidth();
-	INT R2 = obj2.pos.x + obj2.GetHalfWidth();
+	FLOAT L1 = obj1.pos.x - obj1.GetHalfWidth();
+	FLOAT R1 = obj1.pos.x + obj1.GetHalfWidth();
+	FLOAT L2 = obj2.pos.x - obj2.GetHalfWidth();
+	FLOAT R2 = obj2.pos.x + obj2.GetHalfWidth();
 	if ((L1 - R2) * (L2 - R1) < 0) //왼점에서 오른점 뺀게 부호가 다르면 비충돌
 		return FALSE;
 	L1 = obj1.pos.y - obj1.GetHalfHeight();
@@ -408,30 +469,29 @@ VOID PLAYER::OutedBorder()
 
 VOID PLAYER::ShotBullet()
 {
-	if (tFiring.IsEnoughPassed())
+	if (tFiring.IsEnoughPassed(TRUE) == FALSE)
+		return;
+	for (int i = 0; i < 100; i++)
 	{
-		for (int i = 0; i < 100; i++)
-		{
-			if (bullet[i].visible)
-				continue;
-			bullet[i].visible = TRUE;
-			bullet[i].SetStartPos({ pos.x + bullet[i].GetHalfWidth() + GetHalfWidth() - 5, pos.y + bullet[i].GetHalfHeight() + 6 ,0 });
-			bullet[i].ChangeType(attackType);
-			bullet[i].Init();
+		if (bullet[i].visible)
+			continue;
+		bullet[i].visible = TRUE;
+		bullet[i].SetStartPos({ pos.x + bullet[i].GetHalfWidth() + GetHalfWidth() - 5, pos.y + bullet[i].GetHalfHeight() + 6 ,0 });
+		bullet[i].ChangeType(attackType);
+		bullet[i].Init();
 			break;
-		}
 	}
 }
 
 VOID PLAYER::ChangeAttackType()
 {
-	if (tChangeT.IsEnoughPassed())
+	if (tChangeT.IsEnoughPassed(TRUE))
 		++attackType %= 4;
 }
 
-
+  
 // / ENEMY FUNCTION / //
-VOID ENEMY::HitWithBullet(BULLET* bullet)
+VOID ENEMY1::HitWithBullet(BULLET* bullet)
 {
 	if (bullet->visible)
 		if (OnHit(bullet, this))
@@ -446,3 +506,18 @@ VOID ENEMY::HitWithBullet(BULLET* bullet)
 	//this->GetDamage(5);
 	//bullet->Outed();
 }
+
+VOID ENEMY1::Move()
+{
+	MoveLeft();
+	MoveUp(INT(5 * sinf(0.02 * pos.x)));
+}
+VOID ENEMY1::Init()
+{
+	moveAnim = ANIMATION(6, 100, this);
+}
+VOID ENEMY2::Move(){
+	return;
+}
+// / CUSTOM FUNCTION / //
+VOID AddEnemy(INT type);

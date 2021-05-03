@@ -1,35 +1,21 @@
 ﻿  DeepSea.cpp
   The contents of <coroutine> are available only with C++20 or later.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(86,37): warning C4458: 'texture' 선언은 클래스 멤버를 숨깁니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(54,21): message : 'OBJECT::texture' 선언을 참조하십시오.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(93,16): warning C4244: 'return': 'float'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(98,16): warning C4244: 'return': 'float'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(184,8): warning C4244: '=': 'time_t'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(310,9): warning C4244: '초기화 중': 'float'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(311,9): warning C4244: '초기화 중': 'float'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(312,9): warning C4244: '초기화 중': 'float'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(313,9): warning C4244: '초기화 중': 'float'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(316,18): warning C4244: '=': 'float'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(317,18): warning C4244: '=': 'float'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(318,18): warning C4244: '=': 'float'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(319,18): warning C4244: '=': 'float'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(328,9): warning C4244: '초기화 중': 'float'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(329,9): warning C4244: '초기화 중': 'float'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(330,9): warning C4244: '초기화 중': 'float'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(331,9): warning C4244: '초기화 중': 'float'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(334,18): warning C4244: '=': 'float'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(335,18): warning C4244: '=': 'float'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(336,18): warning C4244: '=': 'float'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(337,18): warning C4244: '=': 'float'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(364,29): warning C4458: 'type' 선언은 클래스 멤버를 숨깁니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(237,7): message : 'BULLET::type' 선언을 참조하십시오.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(405,26): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(302,24): warning C4100: 'obj2': 참조되지 않은 정식 매개 변수입니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(437): message : 컴파일되는 함수 템플릿 인스턴스화 'BOOL OnHit<BULLET*,ENEMY*>(C1,C2)'에 대한 참조를 확인하세요.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(90,37): warning C4458: 'texture' 선언은 클래스 멤버를 숨깁니다.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(60,21): message : 'OBJECT::texture' 선언을 참조하십시오.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(97,16): warning C4244: 'return': 'float'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(102,16): warning C4244: 'return': 'float'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(425,29): warning C4458: 'type' 선언은 클래스 멤버를 숨깁니다.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(259,7): message : 'BULLET::type' 선언을 참조하십시오.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(466,26): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(513,27): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\DeepSea.cpp(237,16): warning C4244: '초기화 중': 'double'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\DeepSea.cpp(248,12): warning C4102: 'defualt': 참조되지 않은 레이블입니다.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(352,24): warning C4100: 'obj2': 참조되지 않은 정식 매개 변수입니다.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(497): message : 컴파일되는 함수 템플릿 인스턴스화 'BOOL OnHit<BULLET*,ENEMY1*>(C1,C2)'에 대한 참조를 확인하세요.
           with
           [
               C1=BULLET *,
-              C2=ENEMY *
+              C2=ENEMY1 *
           ]
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(302,15): warning C4100: 'obj1': 참조되지 않은 정식 매개 변수입니다.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(352,15): warning C4100: 'obj1': 참조되지 않은 정식 매개 변수입니다.
   DeepSea_2010.vcxproj -> C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\Debug\DeepSea.exe

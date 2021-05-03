@@ -3,7 +3,11 @@
 BACKGROUND g_bgIngame[2][4] = { { BACKGROUND(), }, };
 
 PLAYER g_player = PLAYER(0, 0, 87, 34);
-ENEMY enemy = ENEMY(100,10,0,0,152, 83);
+ENEMY1 semple_Enemy1 = ENEMY1(100,4,0,0,152, 83);
+ENEMY2 enemy2 = ENEMY2(100,4,0,83,199,74);
+std::list<ENEMY1> g_enemy1;
+std::list<ENEMY2> g_enemy2;
+
 HRESULT InitD3D( HWND hWnd )
 {
     // Create the D3D object, which is needed to create the D3DDevice.
@@ -14,7 +18,7 @@ HRESULT InitD3D( HWND hWnd )
     d3dpp.Windowed = TRUE;
     d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
     d3dpp.BackBufferFormat = D3DFMT_UNKNOWN;
-
+    srand((INT)time(NULL));
     if( FAILED( g_pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd,
                                       D3DCREATE_SOFTWARE_VERTEXPROCESSING,
                                       &d3dpp, &g_pd3dDevice ) ) )
@@ -160,8 +164,13 @@ VOID GameInit(){
     //Inite to Enemy 
     {
         OBJECT::LoadTexture(L"Resources/enemy1.png", &texture);
-        enemy.SetTexture(texture);
-        enemy.visible = true;
+        semple_Enemy1.SetTexture(texture);
+        semple_Enemy1.visible = TRUE;
+        semple_Enemy1.pos.x = SCREEN_WIDTH;
+        enemy2.SetTexture(texture);
+        enemy2.visible = TRUE;
+        AddEnemy(1);
+        AddEnemy(1);
     }
 }
 
@@ -169,10 +178,18 @@ VOID GameRender(){
     for (int i = 0; i < 4; i++)
         for (int j = 0; j < 2; j++)
     g_bgIngame[j][i].Draw();;
+
     g_player.Draw();
+    
     for (int i = 0; i < 100; i++)
         g_player.bullet[i].Draw();
-    enemy.Draw();
+    
+    for (std::list<ENEMY1>::iterator enemy = g_enemy1.begin(); enemy != g_enemy1.end(); ++enemy)
+    {
+        enemy->Draw();
+    }
+    enemy2.Draw();
+    semple_Enemy1.Draw();
 }
 
 VOID GameUpdate() {
@@ -187,17 +204,48 @@ VOID GameUpdate() {
     {
         g_player.bullet[i].Fired();
         if (g_player.bullet[i].visible)
-            if (OnHit(g_player.bullet[i], enemy))
+            for (std::list<ENEMY1>::iterator enemy = g_enemy1.begin(); enemy != g_enemy1.end(); ++enemy)
             {
-                enemy.GetDamage(5);
-                g_player.bullet[i].Outed();
+                //enemy->HitWithBullet(&g_player.bullet[i]);
+                if (OnHit(g_player.bullet[i], *enemy))
+                {
+                    enemy->GetDamage(5);
+                    g_player.bullet[i].Outed();
+                }
             }
     }
-    enemy.ChangeColor();
-    enemy.moveAnim.PlayAnim();
+
+    if (OnHit(g_player, g_enemy1.begin()))
+        g_player.GetDamage(1);
+    semple_Enemy1.moveAnim.PlayAnim();
+    enemy2.moveAnim.PlayAnim();
+    for (std::list<ENEMY1>::iterator enemy = g_enemy1.begin(); enemy != g_enemy1.end(); ++enemy)
+    {
+        enemy->moveAnim.PlayAnim();
+        enemy->Move();
+        enemy->ChangeColor();
+    }
 }
 
 VOID GameRelease() {
 
 }
 
+
+VOID AddEnemy(INT type)
+{
+    FLOAT yPos = SCREEN_HEIGHT * 0.1 * (1 + (rand() % 9));
+    ENEMY1 e = semple_Enemy1;  
+    switch (type)
+    {
+    case 1:
+        semple_Enemy1.pos.y = yPos;
+        g_enemy1.push_back(e);
+        g_enemy1.rbegin()->Init();
+        break;
+    case 2:
+        break;
+    defualt: return;
+        break;
+    }
+}
