@@ -3,10 +3,11 @@
 BACKGROUND g_bgIngame[2][4] = { { BACKGROUND(), }, };
 
 PLAYER g_player = PLAYER(0, 0, 87, 34);
-ENEMY1 semple_Enemy1 = ENEMY1(100,4,0,0,152, 83);
-ENEMY2 enemy2 = ENEMY2(100,4,0,83,199,74);
+ENEMY1 semple_Enemy1 = ENEMY1(100, 4, 0, 0, 152, 83);
+ENEMY2 enemy2 = ENEMY2(100, 4, 0, 83, 199, 74);
 std::list<ENEMY1> g_enemy1;
 std::list<ENEMY2> g_enemy2;
+UI u_playerState = UI(0, 0, 1000, 188);
 
 HRESULT InitD3D( HWND hWnd )
 {
@@ -152,6 +153,14 @@ VOID GameInit(){
             g_bgIngame[1][i].SetMoveSpeed(g_bgIngame[0][i].GetMoveSpeed());
         }
     }
+    //Inite to UI "u_playerState"
+    {
+        
+        OBJECT::LoadTexture(L"Resources/UI.png",   &texture);
+        u_playerState.SetTexture(texture);
+        u_playerState.pos.y = SCREEN_HEIGHT - u_playerState.GetHalfHeight();
+        u_playerState.visible = TRUE;
+    }
     //Init to Player "g_Player"
     {
         OBJECT::LoadTexture(L"Resources/Player.png", &texture);
@@ -190,16 +199,31 @@ VOID GameRender(){
     }
     enemy2.Draw();
     semple_Enemy1.Draw();
+    u_playerState.Draw();
 }
 
 VOID GameUpdate() {
     for (int j = 0; j < 2; j++)
         for (int i = 1; i < 4; i++)
             g_bgIngame[j][i].MoveBackground();
+    PlayerUpdate();
+    EnemyUpdate();
+    if (OnHit(g_player, g_enemy1.begin()))
+        g_player.GetDamage(1);
+    semple_Enemy1.moveAnim.PlayAnim();
+    enemy2.moveAnim.PlayAnim();
 
-    g_player.pos.x -= 2;
+}
+
+VOID GameRelease() {
+
+}
+
+VOID PlayerUpdate()
+{
     g_player.Control();
     g_player.OutedBorder();
+
     for (int i = 0; i < 100; i++)
     {
         g_player.bullet[i].Fired();
@@ -214,11 +238,10 @@ VOID GameUpdate() {
                 }
             }
     }
+}
 
-    if (OnHit(g_player, g_enemy1.begin()))
-        g_player.GetDamage(1);
-    semple_Enemy1.moveAnim.PlayAnim();
-    enemy2.moveAnim.PlayAnim();
+VOID EnemyUpdate()
+{
     for (std::list<ENEMY1>::iterator enemy = g_enemy1.begin(); enemy != g_enemy1.end(); ++enemy)
     {
         enemy->moveAnim.PlayAnim();
@@ -226,11 +249,6 @@ VOID GameUpdate() {
         enemy->ChangeColor();
     }
 }
-
-VOID GameRelease() {
-
-}
-
 
 VOID AddEnemy(INT type)
 {

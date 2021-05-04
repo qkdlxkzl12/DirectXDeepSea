@@ -130,6 +130,16 @@ public:
 	}
 };
 
+class UI : public OBJECT
+{
+public:
+	UI(INT startPosX, INT startPosY, INT width, INT height) : OBJECT(startPosX, startPosY, width, height)
+	{
+
+	};
+
+};
+
 class ACTOR : public OBJECT
 {
 private:
@@ -301,7 +311,6 @@ public:
 	VOID OutedBorder();
 	VOID ShotBullet();
 	VOID ChangeAttackType();
-	
 };
 
 class ENEMY : public ACTOR
@@ -320,7 +329,8 @@ public:
 class ENEMY1 : public ENEMY
 {
 private:
-
+	INT movementSize;
+	INT movement;
 public:
 	VOID Init();
 	ENEMY1(INT health, INT moveSpeed, INT startPosX, INT startPosY, INT width, INT height) : ENEMY(health, moveSpeed, startPosX, startPosY, width, height) 
@@ -334,6 +344,7 @@ public:
 
 class ENEMY2 : public ENEMY
 {
+private:
 public :
 	ENEMY2(INT health, INT moveSpeed, INT startPosX, INT startPosY, INT width, INT height) : ENEMY(health, moveSpeed, startPosX, startPosY, width, height) 
 	{
@@ -348,6 +359,8 @@ VOID GameRender();
 VOID GameUpdate();
 VOID GameRelease();
 
+VOID PlayerUpdate();
+VOID EnemyUpdate();
 template<class C1, class C2>
 BOOL OnHit(C1 obj1, C2 obj2)
 {
@@ -460,6 +473,7 @@ VOID PLAYER::Control()
 
 VOID PLAYER::OutedBorder()
 {
+	pos.x -= 2;
 	if (pos.x - GetHalfWidth() < -20)
 	{
 		GetDamage(10);
@@ -489,12 +503,11 @@ VOID PLAYER::ChangeAttackType()
 		++attackType %= 4;
 }
 
-  
 // / ENEMY FUNCTION / //
 VOID ENEMY1::HitWithBullet(BULLET* bullet)
 {
-	if (bullet->visible)
-		if (OnHit(bullet, this))
+	if (bullet->visible == TRUE)
+		if (OnHit(bullet, *this))
 		{
 			this->GetDamage(5);
 			bullet->Outed();
@@ -510,11 +523,13 @@ VOID ENEMY1::HitWithBullet(BULLET* bullet)
 VOID ENEMY1::Move()
 {
 	MoveLeft();
-	MoveUp(INT(5 * sinf(0.02 * pos.x)));
+	MoveUp(INT(movementSize * sinf(0.1 / movementSize * pos.x)));
 }
 VOID ENEMY1::Init()
 {
 	moveAnim = ANIMATION(6, 100, this);
+	movementSize = 3 + rand() % 5;
+	
 }
 VOID ENEMY2::Move(){
 	return;
