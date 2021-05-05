@@ -157,10 +157,8 @@ public:
 		tOnHit = TIME(60);
 	}
 
-	ACTOR(INT health,INT moveSpeed, INT startPosX, INT startPosY, INT width, INT height) : OBJECT( startPosX,  startPosY,  width,  height)
+	ACTOR(INT startPosX, INT startPosY, INT width, INT height) : OBJECT( startPosX,  startPosY,  width,  height)
 	{
-		maxHealth = health;
-		currentHealth = maxHealth;
 		ACTOR::moveSpeed = moveSpeed;
 		tOnHit = TIME(60);
 	}
@@ -217,6 +215,12 @@ public:
 		
 	}
 
+	VOID Init(INT health,INT mSpeed)
+	{
+		moveSpeed = mSpeed;
+		maxHealth = health;
+		currentHealth = maxHealth;
+	}
 	VOID ChangeColor()
 	{
 		color = 0xffffffff; 
@@ -299,8 +303,9 @@ private:
 public:
 	BULLET bullet[100] = { BULLET(), };
 
-	PLAYER(INT startPosX, INT startPosY, INT width, INT height) : ACTOR(100, 5, startPosX, startPosY, width, height)
+	PLAYER(INT startPosX, INT startPosY, INT width, INT height) : ACTOR( startPosX, startPosY, width, height)
 	{
+		ACTOR::Init(100, 5);
 		isShoted = FALSE;
 		attackType = 0;
 		tFiring = TIME(100);
@@ -315,43 +320,24 @@ public:
 
 class ENEMY : public ACTOR
 {
+private:
+	INT Type = 0;
+	INT movementSize = 0;
+	INT movement = 0;
 public:
 	ENEMY() {};
-	ENEMY(INT health, INT moveSpeed, INT startPosX, INT startPosY, INT width, INT height) : ACTOR(health, moveSpeed, startPosX, startPosY, width, height)
+	ENEMY(INT startPosX, INT startPosY, INT width, INT height) : ACTOR(startPosX, startPosY, width, height)
 	{
+		
+		moveAnim = ANIMATION(6, 100, this);
 
+		//moveAnim = ANIMATION(4, 70, this);
 	}
-
-	ANIMATION moveAnim;
-	virtual VOID Move() = 0;
-};
-
-class ENEMY1 : public ENEMY
-{
-private:
-	INT movementSize;
-	INT movement;
-public:
-	VOID Init();
-	ENEMY1(INT health, INT moveSpeed, INT startPosX, INT startPosY, INT width, INT height) : ENEMY(health, moveSpeed, startPosX, startPosY, width, height) 
-	{
-	moveAnim = ANIMATION(6, 100, this);
-	};
 	VOID HitWithBullet(BULLET* bullet);
-	VOID Move() override;
-
-};
-
-class ENEMY2 : public ENEMY
-{
-private:
-public :
-	ENEMY2(INT health, INT moveSpeed, INT startPosX, INT startPosY, INT width, INT height) : ENEMY(health, moveSpeed, startPosX, startPosY, width, height) 
-	{
-		moveAnim = ANIMATION(4, 70, this);
-	};
-	VOID Move() override;
-
+	ANIMATION moveAnim;
+	VOID Move();
+	VOID Init();
+	VOID Release();
 };
 
 VOID GameInit();
@@ -361,6 +347,8 @@ VOID GameRelease();
 
 VOID PlayerUpdate();
 VOID EnemyUpdate();
+
+VOID AddEnemy(INT type);
 template<class C1, class C2>
 BOOL OnHit(C1 obj1, C2 obj2)
 {
@@ -380,7 +368,7 @@ BOOL OnHit(C1 obj1, C2 obj2)
 	return FALSE;
 }
 template<>
-BOOL OnHit<BULLET,ENEMY1>(BULLET obj1, ENEMY1 obj2)
+BOOL OnHit<BULLET,ENEMY>(BULLET obj1, ENEMY obj2)
 {
 	FLOAT L1 = obj1.pos.x - obj1.GetHalfWidth();
 	FLOAT R1 = obj1.pos.x + obj1.GetHalfWidth();
@@ -397,7 +385,7 @@ BOOL OnHit<BULLET,ENEMY1>(BULLET obj1, ENEMY1 obj2)
 	return TRUE;
 }
 template<>
-BOOL OnHit<PLAYER, ENEMY1>(PLAYER obj1, ENEMY1 obj2)
+BOOL OnHit<PLAYER, ENEMY>(PLAYER obj1, ENEMY obj2)
 {
 	FLOAT L1 = obj1.pos.x - obj1.GetHalfWidth();
 	FLOAT R1 = obj1.pos.x + obj1.GetHalfWidth();
@@ -467,7 +455,8 @@ VOID PLAYER::Control()
 		ShotBullet();
 	if (KEY_DOWN(INT('X')))
 		ChangeAttackType();
-
+	if (KEY_DOWN(INT('Z')))
+		AddEnemy(1);
 	ChangeColor();
 }
 
@@ -504,7 +493,7 @@ VOID PLAYER::ChangeAttackType()
 }
 
 // / ENEMY FUNCTION / //
-VOID ENEMY1::HitWithBullet(BULLET* bullet)
+VOID ENEMY::HitWithBullet(BULLET* bullet)
 {
 	if (bullet->visible == TRUE)
 		if (OnHit(bullet, *this))
@@ -520,19 +509,20 @@ VOID ENEMY1::HitWithBullet(BULLET* bullet)
 	//bullet->Outed();
 }
 
-VOID ENEMY1::Move()
+VOID ENEMY::Move()
 {
 	MoveLeft();
 	MoveUp(INT(movementSize * sinf(0.1 / movementSize * pos.x)));
 }
-VOID ENEMY1::Init()
+VOID ENEMY::Init()
 {
+	ACTOR::Init(10,4);
 	moveAnim = ANIMATION(6, 100, this);
 	movementSize = 3 + rand() % 5;
-	
 }
-VOID ENEMY2::Move(){
-	return;
+
+VOID ENEMY::Release()
+{
+	visible = FALSE;
 }
 // / CUSTOM FUNCTION / //
-VOID AddEnemy(INT type);

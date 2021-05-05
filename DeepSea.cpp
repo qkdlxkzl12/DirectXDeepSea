@@ -3,10 +3,9 @@
 BACKGROUND g_bgIngame[2][4] = { { BACKGROUND(), }, };
 
 PLAYER g_player = PLAYER(0, 0, 87, 34);
-ENEMY1 semple_Enemy1 = ENEMY1(100, 4, 0, 0, 152, 83);
-ENEMY2 enemy2 = ENEMY2(100, 4, 0, 83, 199, 74);
-std::list<ENEMY1> g_enemy1;
-std::list<ENEMY2> g_enemy2;
+ENEMY semple_Enemy1 = ENEMY(0, 0, 152, 83);
+ENEMY semple_Enemy2 = ENEMY(0, 83, 199, 74);
+std::list<ENEMY> g_enemy;
 UI u_playerState = UI(0, 0, 1000, 188);
 
 HRESULT InitD3D( HWND hWnd )
@@ -176,8 +175,8 @@ VOID GameInit(){
         semple_Enemy1.SetTexture(texture);
         semple_Enemy1.visible = TRUE;
         semple_Enemy1.pos.x = SCREEN_WIDTH;
-        enemy2.SetTexture(texture);
-        enemy2.visible = TRUE;
+        semple_Enemy2.SetTexture(texture);
+        semple_Enemy2.visible = TRUE;
         AddEnemy(1);
         AddEnemy(1);
     }
@@ -193,11 +192,11 @@ VOID GameRender(){
     for (int i = 0; i < 100; i++)
         g_player.bullet[i].Draw();
     
-    for (std::list<ENEMY1>::iterator enemy = g_enemy1.begin(); enemy != g_enemy1.end(); ++enemy)
+    for (std::list<ENEMY>::iterator enemy = g_enemy.begin(); enemy != g_enemy.end(); ++enemy)
     {
         enemy->Draw();
     }
-    enemy2.Draw();
+    semple_Enemy2.Draw();
     semple_Enemy1.Draw();
     u_playerState.Draw();
 }
@@ -208,10 +207,10 @@ VOID GameUpdate() {
             g_bgIngame[j][i].MoveBackground();
     PlayerUpdate();
     EnemyUpdate();
-    if (OnHit(g_player, g_enemy1.begin()))
+    if (OnHit(g_player, g_enemy.begin()))
         g_player.GetDamage(1);
     semple_Enemy1.moveAnim.PlayAnim();
-    enemy2.moveAnim.PlayAnim();
+    semple_Enemy2.moveAnim.PlayAnim();
 
 }
 
@@ -228,7 +227,7 @@ VOID PlayerUpdate()
     {
         g_player.bullet[i].Fired();
         if (g_player.bullet[i].visible)
-            for (std::list<ENEMY1>::iterator enemy = g_enemy1.begin(); enemy != g_enemy1.end(); ++enemy)
+            for (std::list<ENEMY>::iterator enemy = g_enemy.begin(); enemy != g_enemy.end(); ++enemy)
             {
                 //enemy->HitWithBullet(&g_player.bullet[i]);
                 if (OnHit(g_player.bullet[i], *enemy))
@@ -242,24 +241,32 @@ VOID PlayerUpdate()
 
 VOID EnemyUpdate()
 {
-    for (std::list<ENEMY1>::iterator enemy = g_enemy1.begin(); enemy != g_enemy1.end(); ++enemy)
+    for (std::list<ENEMY>::iterator enemy = g_enemy.begin(); enemy != g_enemy.end(); enemy++)
     {
         enemy->moveAnim.PlayAnim();
         enemy->Move();
         enemy->ChangeColor();
+
+        if (enemy->GetHealth() < 0)
+        {
+            //auto e = ++enemy;
+            g_enemy.erase(enemy++);
+        }
+        if (enemy == g_enemy.end())
+            break;
     }
 }
 
 VOID AddEnemy(INT type)
 {
     FLOAT yPos = SCREEN_HEIGHT * 0.1 * (1 + (rand() % 9));
-    ENEMY1 e = semple_Enemy1;  
+    ENEMY e = semple_Enemy1;  
     switch (type)
     {
     case 1:
         semple_Enemy1.pos.y = yPos;
-        g_enemy1.push_back(e);
-        g_enemy1.rbegin()->Init();
+        g_enemy.push_back(e);
+        g_enemy.rbegin()->Init();
         break;
     case 2:
         break;
