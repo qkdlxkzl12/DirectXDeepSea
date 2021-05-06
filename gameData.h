@@ -294,6 +294,7 @@ private:
 	INT attackType;
 	TIME tFiring;
 	TIME tChangeT;
+	TIME tHitDelay;
 	
 public:
 	BULLET bullet[100] = { BULLET(), };
@@ -305,8 +306,9 @@ public:
 		attackType = 0;
 		tFiring = TIME(100);
 		tChangeT = TIME(1000);
+		tHitDelay = TIME(1000);
 	}
-
+	VOID GetDamage(INT damage);
 	VOID Control();
 	VOID OutedBorder();
 	VOID ShotBullet();
@@ -326,8 +328,9 @@ public:
 	{
 
 	}
-	VOID HitWithBullet(BULLET* bullet);
 	ANIMATION moveAnim = ANIMATION();
+	VOID HitWithBullet(BULLET* bullet);
+	VOID HitWithPlayer(PLAYER* player);
 	VOID Move();
 	VOID Init(INT type);
 };
@@ -411,6 +414,11 @@ VOID BULLET::Outed()
 }
 
 // / PLAYER FUNCTION / //
+VOID PLAYER::GetDamage(INT damage)
+{
+	if(tHitDelay.IsEnoughPassed(TRUE))
+	ACTOR::GetDamage(damage);
+}
 VOID PLAYER::Control()
 {
 	if (KEY_DOWN(VK_LEFT))
@@ -468,18 +476,16 @@ VOID PLAYER::ChangeAttackType()
 // / ENEMY FUNCTION / //
 VOID ENEMY::HitWithBullet(BULLET* bullet)
 {
-	if (bullet->visible == TRUE)
-		if (OnHit(bullet, *this))
-		{
-			this->GetDamage(5);
-			bullet->Outed();
-		}
-	//if (bullet->visible == FALSE)
-	//	return;
-	//if (OnHit(&bullet, this) == FALSE)
-	//	return;
-	//this->GetDamage(5);
-	//bullet->Outed();
+		if (OnHit(*bullet, *this) == FALSE)
+			return;
+	this->GetDamage(5);
+	bullet->Outed();
+}
+VOID ENEMY::HitWithPlayer(PLAYER* player)
+{
+	if (OnHit(*player, *this) == FALSE)
+		return;
+	player->GetDamage(5);
 }
 VOID ENEMY::Move()
 {

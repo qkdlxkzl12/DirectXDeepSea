@@ -198,8 +198,6 @@ VOID GameRender(){
     {
         enemy->Draw();
     }
-    semple_Enemy2.Draw();
-    semple_Enemy1.Draw();
     u_playerState.Draw();
 }
 
@@ -225,15 +223,10 @@ VOID PlayerUpdate()
     for (int i = 0; i < 100; i++)
     {
         g_player.bullet[i].Fired();
-        if (g_player.bullet[i].visible)
+        if (g_player.bullet[i].visible == TRUE)
             for (std::list<ENEMY>::iterator enemy = g_enemy.begin(); enemy != g_enemy.end(); ++enemy)
             {
-                //enemy->HitWithBullet(&g_player.bullet[i]);
-                if (OnHit(g_player.bullet[i], *enemy))
-                {
-                    enemy->GetDamage(5);
-                    g_player.bullet[i].Outed();
-                }
+                enemy->HitWithBullet(&g_player.bullet[i]);
             }
     }
 }
@@ -245,15 +238,18 @@ VOID EnemyUpdate()
         enemy->moveAnim.PlayAnim();
         enemy->Move();
         enemy->ChangeColor();
-
+        if (OnHit(g_player, *enemy))
+        {
+            g_player.GetDamage(5);
+        }
         if (enemy->GetHealth() < 0 || enemy->pos.x < - enemy->GetHalfHeight())
         {
-            //auto e = ++enemy;
             g_enemy.erase(enemy++);
         }
         if (enemy == g_enemy.end())
             break;
     }
+    
 }
 
 VOID AddEnemy(INT type)
