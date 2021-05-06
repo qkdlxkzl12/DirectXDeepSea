@@ -169,7 +169,7 @@ VOID GameInit(){
         for (int i = 0; i < 100; i++)
             g_player.bullet[i].texture = g_player.bullet[0].texture;
     }
-    //Inite to Enemy 
+    //Inite to Enemy  "smeple_Eme,y"
     {
         OBJECT::LoadTexture(L"Resources/enemy1.png", &texture);
         semple_Enemy1.SetTexture(texture);
@@ -177,6 +177,8 @@ VOID GameInit(){
         semple_Enemy1.pos.x = SCREEN_WIDTH;
         semple_Enemy2.SetTexture(texture);
         semple_Enemy2.visible = TRUE;
+        semple_Enemy2.pos.x = SCREEN_WIDTH;
+        AddEnemy(1);
         AddEnemy(1);
         AddEnemy(1);
     }
@@ -209,9 +211,6 @@ VOID GameUpdate() {
     EnemyUpdate();
     if (OnHit(g_player, g_enemy.begin()))
         g_player.GetDamage(1);
-    semple_Enemy1.moveAnim.PlayAnim();
-    semple_Enemy2.moveAnim.PlayAnim();
-
 }
 
 VOID GameRelease() {
@@ -241,13 +240,13 @@ VOID PlayerUpdate()
 
 VOID EnemyUpdate()
 {
-    for (std::list<ENEMY>::iterator enemy = g_enemy.begin(); enemy != g_enemy.end(); enemy++)
+    for (std::list<ENEMY>::iterator enemy = g_enemy.begin(); enemy != g_enemy.end(); ++enemy)
     {
         enemy->moveAnim.PlayAnim();
         enemy->Move();
         enemy->ChangeColor();
 
-        if (enemy->GetHealth() < 0)
+        if (enemy->GetHealth() < 0 || enemy->pos.x < - enemy->GetHalfHeight())
         {
             //auto e = ++enemy;
             g_enemy.erase(enemy++);
@@ -259,18 +258,23 @@ VOID EnemyUpdate()
 
 VOID AddEnemy(INT type)
 {
-    FLOAT yPos = SCREEN_HEIGHT * 0.1 * (1 + (rand() % 9));
-    ENEMY e = semple_Enemy1;  
+    FLOAT yPos; 
+    ENEMY e;
     switch (type)
     {
     case 1:
-        semple_Enemy1.pos.y = yPos;
-        g_enemy.push_back(e);
-        g_enemy.rbegin()->Init();
+        yPos = SCREEN_HEIGHT * 0.1 * (3 + (rand() % 5));
+        e = semple_Enemy1;
         break;
     case 2:
+        yPos = SCREEN_HEIGHT * 0.1 * (3 + (rand() % 6));
+        e = semple_Enemy2;
         break;
     defualt: return;
         break;
     }
+
+    g_enemy.push_back(e);
+    g_enemy.rbegin()->pos.y = yPos;
+    g_enemy.rbegin()->Init(type);
 }

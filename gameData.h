@@ -81,12 +81,12 @@ public:
 		pos = { SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f, 0 };
 		color = 0xffffffff;
 	}
+
 	VOID Draw()
 	{
 		if (visible)
 			g_pSprite->Draw(texture, &rect, &center, &pos, color);
 	}
-
 	VOID SetTexture(LPDIRECT3DTEXTURE9 texture)
 	{
 		this->texture = texture;
@@ -96,7 +96,6 @@ public:
 	{
 		return center.x;
 	}
-
 	INT GetHalfHeight()
 	{
 		return center.y;
@@ -156,13 +155,11 @@ public:
 		moveSpeed = 1;
 		tOnHit = TIME(60);
 	}
-
 	ACTOR(INT startPosX, INT startPosY, INT width, INT height) : OBJECT( startPosX,  startPosY,  width,  height)
 	{
 		ACTOR::moveSpeed = moveSpeed;
 		tOnHit = TIME(60);
 	}
-
 
 	VOID MoveLeft()
 	{
@@ -240,7 +237,6 @@ private:
 	INT moveSpeed;
 
 public:
-
 	BACKGROUND()
 	{
 		OBJECT();
@@ -251,18 +247,17 @@ public:
 	{
 		moveSpeed = Value;
 	}
-
-	INT GetMoveSpeed()
-	{
-		return moveSpeed;
-	}
-
 	VOID MoveBackground()
 	{
 		pos.x -= GetMoveSpeed();
 
 		if (pos.x <= SCREEN_WIDTH * -0.5f)
 			pos.x = SCREEN_WIDTH * 1.5f;
+	}
+
+	INT GetMoveSpeed()
+	{
+		return moveSpeed;
 	}
 };
 
@@ -305,7 +300,7 @@ public:
 
 	PLAYER(INT startPosX, INT startPosY, INT width, INT height) : ACTOR( startPosX, startPosY, width, height)
 	{
-		ACTOR::Init(100, 5);
+		ACTOR::Init(100, 6);
 		isShoted = FALSE;
 		attackType = 0;
 		tFiring = TIME(100);
@@ -321,23 +316,20 @@ public:
 class ENEMY : public ACTOR
 {
 private:
-	INT Type = 0;
-	INT movementSize = 0;
-	INT movement = 0;
+	INT type = 0;
+	INT movementSize = 0; //<t> 1 = 크기, 2 = 기울기
+	INT movementValue1 = 0;//<t> 1 = 폭
+	INT movementValue2 = 0;//<t> 1= 높이
 public:
 	ENEMY() {};
 	ENEMY(INT startPosX, INT startPosY, INT width, INT height) : ACTOR(startPosX, startPosY, width, height)
 	{
-		
-		moveAnim = ANIMATION(6, 100, this);
 
-		//moveAnim = ANIMATION(4, 70, this);
 	}
 	VOID HitWithBullet(BULLET* bullet);
-	ANIMATION moveAnim;
+	ANIMATION moveAnim = ANIMATION();
 	VOID Move();
-	VOID Init();
-	VOID Release();
+	VOID Init(INT type);
 };
 
 VOID GameInit();
@@ -352,19 +344,6 @@ VOID AddEnemy(INT type);
 template<class C1, class C2>
 BOOL OnHit(C1 obj1, C2 obj2)
 {
-	//FLOAT L1 = obj1.pos.x - obj1.GetHalfWidth();
-	//FLOAT R1 = obj1.pos.x + obj1.GetHalfWidth();
-	//FLOAT L2 = obj2.pos.x - obj2.GetHalfWidth();
-	//FLOAT R2 = obj2.pos.x + obj2.GetHalfWidth();
-	//if ((L1 - R2)*(L2 - R1) < 0) //왼점에서 오른점 뺀게 부호가 다르면 비충돌
-	//	return FALSE;
-	//L1 = obj1.pos.y - obj1.GetHalfHeight();
-	//R1 = obj1.pos.y + obj1.GetHalfHeight();
-	//L2 = obj2.pos.y - obj2.GetHalfHeight();
-	//R2 = obj2.pos.y + obj2.GetHalfHeight();
-	//if ((L1 - R2) * (L2 - R1) < 0) //윗점에서 아랫점 뺀게 부호가 다르면 비충돌
-	//	return FALSE;
-	//return TRUE;
 	return FALSE;
 }
 template<>
@@ -407,13 +386,11 @@ VOID BULLET::SetStartPos(D3DXVECTOR3 vector3)
 {
 	startPos = vector3;
 }
-
 VOID BULLET::Init()
 {
 	pos = startPos;
 	isFired = TRUE;
 }
-
 VOID BULLET::Fired()
 {
 	if (!isFired)
@@ -422,19 +399,16 @@ VOID BULLET::Fired()
 	if (pos.x - GetHalfWidth() > SCREEN_WIDTH)
 		Outed();
 }
-
 VOID BULLET::ChangeType(INT type)
 {
 	BULLET::type = type;
 	rect = { 100,10 * type,110,10 * type + 6 };
 }
-
 VOID BULLET::Outed()
 {
 	isFired = FALSE;
 	visible = FALSE;
 }
-
 
 // / PLAYER FUNCTION / //
 VOID PLAYER::Control()
@@ -455,11 +429,12 @@ VOID PLAYER::Control()
 		ShotBullet();
 	if (KEY_DOWN(INT('X')))
 		ChangeAttackType();
-	if (KEY_DOWN(INT('Z')))
+	if (KEY_DOWN(INT('A')))
 		AddEnemy(1);
+	if (KEY_DOWN(INT('S')))
+		AddEnemy(2);
 	ChangeColor();
 }
-
 VOID PLAYER::OutedBorder()
 {
 	pos.x -= 2;
@@ -469,7 +444,6 @@ VOID PLAYER::OutedBorder()
 		pos.x = GetHalfWidth() + 30;
 	}
 }
-
 VOID PLAYER::ShotBullet()
 {
 	if (tFiring.IsEnoughPassed(TRUE) == FALSE)
@@ -485,7 +459,6 @@ VOID PLAYER::ShotBullet()
 			break;
 	}
 }
-
 VOID PLAYER::ChangeAttackType()
 {
 	if (tChangeT.IsEnoughPassed(TRUE))
@@ -508,21 +481,46 @@ VOID ENEMY::HitWithBullet(BULLET* bullet)
 	//this->GetDamage(5);
 	//bullet->Outed();
 }
-
 VOID ENEMY::Move()
 {
+
 	MoveLeft();
-	MoveUp(INT(movementSize * sinf(0.1 / movementSize * pos.x)));
+	switch (type)
+	{
+	case 1:
+		MoveUp(movementSize / (0.1 * movementValue1) * sinf( 0.1 / movementSize * pos.x));
+		break;
+	case 2:
+		MoveUp(0.001 * movementSize * pos.x);
+		break;
+	default:return;
+		break;
+	}
 }
-VOID ENEMY::Init()
+VOID ENEMY::Init(INT type)
 {
-	ACTOR::Init(10,4);
-	moveAnim = ANIMATION(6, 100, this);
-	movementSize = 3 + rand() % 5;
+
+	this->type = type;
+	switch (this->type)
+	{
+	case 1:
+		ACTOR::Init(30, 4);
+		movementSize = 4 + rand() % 4;
+		movementValue1 = 12;
+		movementValue2 = 8;
+		moveAnim = ANIMATION(6, 100, this);
+		break;
+	case 2:
+		if (pos.y <= SCREEN_HEIGHT * 0.4)
+			movementSize = 1 + rand() % 2;
+		else if (pos.y <= SCREEN_HEIGHT * 0.6)
+			movementSize = -2 + rand() % 3;
+		else
+			movementSize = 1 + rand() % -4;
+		ACTOR::Init(10, 8);
+		moveAnim = ANIMATION(4, 70, this);
+		break;
+	}
 }
 
-VOID ENEMY::Release()
-{
-	visible = FALSE;
-}
-// / CUSTOM FUNCTION / //
+// / CUSTOM FUNCTION / // 
