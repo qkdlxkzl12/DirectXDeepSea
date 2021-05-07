@@ -416,7 +416,7 @@ VOID BULLET::Outed()
 // / PLAYER FUNCTION / //
 VOID PLAYER::GetDamage(INT damage)
 {
-	if(tHitDelay.IsEnoughPassed(TRUE))
+	if (tHitDelay.IsEnoughPassed(TRUE))
 	ACTOR::GetDamage(damage);
 }
 VOID PLAYER::Control()
@@ -448,7 +448,7 @@ VOID PLAYER::OutedBorder()
 	pos.x -= 2;
 	if (pos.x - GetHalfWidth() < -20)
 	{
-		GetDamage(10);
+		ACTOR::GetDamage(1);
 		pos.x = GetHalfWidth() + 30;
 	}
 }
@@ -510,10 +510,10 @@ VOID ENEMY::Init(INT type)
 	switch (this->type)
 	{
 	case 1:
-		ACTOR::Init(30, 4);
-		movementSize = 4 + rand() % 4;
-		movementValue1 = 12;
-		movementValue2 = 8;
+		ACTOR::Init(25, 4);
+		movementSize = 0.1 * (35 + rand() % 40);
+		movementValue1 = 0.1 *(90 + rand() % 30);
+		movementValue2 = 0.1 * (100 - rand() % 25);
 		moveAnim = ANIMATION(6, 100, this);
 		break;
 	case 2:

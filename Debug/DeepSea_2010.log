@@ -12,17 +12,13 @@ C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(497,48): warning 
 C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(500,31): warning C4244: '인수': 'double'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(506,22): warning C4458: 'type' 선언은 클래스 멤버를 숨깁니다.
 C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(321,6): message : 'ENEMY::type' 선언을 참조하십시오.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\DeepSea.cpp(160,45): warning C4244: '=': 'INT'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\DeepSea.cpp(262,36): warning C4244: '=': 'double'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\DeepSea.cpp(266,36): warning C4244: '=': 'double'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\DeepSea.cpp(269,12): warning C4102: 'defualt': 참조되지 않은 레이블입니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(348,15): warning C4100: 'obj1': 참조되지 않은 정식 매개 변수입니다.
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\DeepSea.cpp(210): message : 컴파일되는 함수 템플릿 인스턴스화 'BOOL OnHit<PLAYER,std::_List_iterator<std::_List_val<std::_List_simple_types<_Ty>>>>(C1,C2)'에 대한 참조를 확인하세요.
-          with
-          [
-              _Ty=ENEMY,
-              C1=PLAYER,
-              C2=std::_List_iterator<std::_List_val<std::_List_simple_types<ENEMY>>>
-          ]
-C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\DeepSea.cpp(274): warning C4701: 초기화되지 않았을 수 있는 'yPos' 지역 변수를 사용했습니다.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(514,22): warning C4244: '=': 'double'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(515,24): warning C4244: '=': 'double'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\gameData.h(516,24): warning C4244: '=': 'double'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\DeepSea.cpp(160,44): warning C4244: '=': 'INT'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\DeepSea.cpp(261,37): warning C4244: '=': 'double'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\DeepSea.cpp(265,37): warning C4244: '=': 'double'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\DeepSea.cpp(268,12): warning C4102: 'defualt': 참조되지 않은 레이블입니다.
+C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\DeepSea.cpp(273): warning C4701: 초기화되지 않았을 수 있는 'yPos' 지역 변수를 사용했습니다.
+DeepSea.obj : warning LNK4075: '/EDITANDCONTINUE'이(가) '/SAFESEH' 사양으로 인해 무시됩니다.
   DeepSea_2010.vcxproj -> C:\Users\Test\Desktop\Coding\2.수업시간\DeepSea\Debug\DeepSea.exe

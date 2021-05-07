@@ -6,7 +6,7 @@ PLAYER g_player = PLAYER(0, 0, 87, 34);
 ENEMY semple_Enemy1 = ENEMY(0, 0, 152, 83);
 ENEMY semple_Enemy2 = ENEMY(0, 83, 199, 74);
 std::list<ENEMY> g_enemy;
-UI u_playerState = UI(0, 0, 1000, 188);
+UI uPlayerState = UI(0, 0, 1000, 188);
 
 HRESULT InitD3D( HWND hWnd )
 {
@@ -156,9 +156,9 @@ VOID GameInit(){
     {
         
         OBJECT::LoadTexture(L"Resources/UI.png",   &texture);
-        u_playerState.SetTexture(texture);
-        u_playerState.pos.y = SCREEN_HEIGHT - u_playerState.GetHalfHeight();
-        u_playerState.visible = TRUE;
+        uPlayerState.SetTexture(texture);
+        uPlayerState.pos.y = SCREEN_HEIGHT - uPlayerState.GetHalfHeight();
+        uPlayerState.visible = TRUE;
     }
     //Init to Player "g_Player"
     {
@@ -198,7 +198,7 @@ VOID GameRender(){
     {
         enemy->Draw();
     }
-    u_playerState.Draw();
+    uPlayerState.Draw();
 }
 
 VOID GameUpdate() {
@@ -207,8 +207,7 @@ VOID GameUpdate() {
             g_bgIngame[j][i].MoveBackground();
     PlayerUpdate();
     EnemyUpdate();
-    if (OnHit(g_player, g_enemy.begin()))
-        g_player.GetDamage(1);
+   
 }
 
 VOID GameRelease() {
@@ -240,7 +239,7 @@ VOID EnemyUpdate()
         enemy->ChangeColor();
         if (OnHit(g_player, *enemy))
         {
-            g_player.GetDamage(5);
+            g_player.GetDamage(1);
         }
         if (enemy->GetHealth() < 0 || enemy->pos.x < - enemy->GetHalfHeight())
         {
@@ -259,11 +258,11 @@ VOID AddEnemy(INT type)
     switch (type)
     {
     case 1:
-        yPos = SCREEN_HEIGHT * 0.1 * (3 + (rand() % 5));
+        yPos = SCREEN_HEIGHT * 0.01 * (25 + (rand() % 50));
         e = semple_Enemy1;
         break;
     case 2:
-        yPos = SCREEN_HEIGHT * 0.1 * (3 + (rand() % 6));
+        yPos = SCREEN_HEIGHT * 0.01 * (25 + (rand() % 60));
         e = semple_Enemy2;
         break;
     defualt: return;
