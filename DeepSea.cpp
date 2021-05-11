@@ -6,7 +6,6 @@ PLAYER g_player = PLAYER(0, 0, 87, 34);
 ENEMY semple_Enemy1 = ENEMY(0, 0, 152, 83);
 ENEMY semple_Enemy2 = ENEMY(0, 83, 199, 74);
 std::list<ENEMY> g_enemy;
-UI uPlayerState = UI(0, 0, 1000, 188);
 
 HRESULT InitD3D( HWND hWnd )
 {
@@ -152,13 +151,13 @@ VOID GameInit(){
             g_bgIngame[1][i].SetMoveSpeed(g_bgIngame[0][i].GetMoveSpeed());
         }
     }
-    //Inite to UI "u_playerState"
+    //Inite to UI "uPlayerState"
     {
-        
         OBJECT::LoadTexture(L"Resources/UI.png",   &texture);
-        uPlayerState.SetTexture(texture);
-        uPlayerState.pos.y = SCREEN_HEIGHT - uPlayerState.GetHalfHeight();
-        uPlayerState.visible = TRUE;
+        g_player.ui.SetTexture(texture);
+        g_player.ui.visible = TRUE;
+        g_player.ui.pos.y = SCREEN_HEIGHT - g_player.ui.GetHalfHeight();
+        g_player.ui.Init();
     }
     //Init to Player "g_Player"
     {
@@ -198,7 +197,7 @@ VOID GameRender(){
     {
         enemy->Draw();
     }
-    uPlayerState.Draw();
+    g_player.ui.Draw();
 }
 
 VOID GameUpdate() {
@@ -207,7 +206,6 @@ VOID GameUpdate() {
             g_bgIngame[j][i].MoveBackground();
     PlayerUpdate();
     EnemyUpdate();
-   
 }
 
 VOID GameRelease() {
@@ -228,6 +226,7 @@ VOID PlayerUpdate()
                 enemy->HitWithBullet(&g_player.bullet[i]);
             }
     }
+    g_player.UIManager();
 }
 
 VOID EnemyUpdate()
@@ -241,7 +240,7 @@ VOID EnemyUpdate()
         {
             g_player.GetDamage(1);
         }
-        if (enemy->GetHealth() < 0 || enemy->pos.x < - enemy->GetHalfHeight())
+        if (enemy->GetHealth() == 0 || enemy->pos.x - enemy->GetHalfHeight() < 0)
         {
             g_enemy.erase(enemy++);
         }

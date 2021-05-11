@@ -19,6 +19,11 @@ LPD3DXSPRITE g_pSprite = NULL;
 
 time_t g_curTime;
 
+struct STATE {
+	INT max;
+	INT current;
+};
+
 class TIME {
 private:
 	time_t oldTime;
@@ -131,27 +136,102 @@ public:
 
 class UI : public OBJECT
 {
+private:
+	RECT image;
 public:
+	UI(){}
 	UI(INT startPosX, INT startPosY, INT width, INT height) : OBJECT(startPosX, startPosY, width, height)
 	{
 
 	};
-
 };
+
+typedef class PLAYER_UI : public UI
+{
+private:
+	UI uSkill[4] = { UI(0,200,64,57),UI(100,200,50,58),UI(200,200,45,47),UI(300,200,63,55) };
+	UI uHealth[10] = { UI(0,400,36,36), };
+	UI uEnergy[10] = { UI(50, 400, 36, 36), };
+public:
+	PLAYER_UI(INT startPosX, INT startPosY, INT width, INT height) : UI(startPosX, startPosY, width, height)
+	{
+
+	};
+
+	VOID Draw()
+	{
+		OBJECT::Draw();
+		for (INT i = 0; i < 4; i++)
+			uSkill[i].Draw();
+		for (INT i = 0; i < 10; i++)
+			uEnergy[i].Draw();
+		for (INT i = 0; i < 10; i++)
+			uHealth[i].Draw();
+	}
+	VOID Init()
+	{
+		for (INT i = 0; i < 4; i++)
+		{
+			uSkill[i].texture = texture;
+			uSkill[i].visible = TRUE;
+			uSkill[i].pos = { pos.x + FLOAT(144 + (i * 120) - GetHalfWidth()), pos.y + 55 - GetHalfHeight(), 0 };
+		}
+		uSkill[0].pos = { pos.x - GetHalfWidth() + 144,pos.y - GetHalfHeight() + 57,0 };
+		uSkill[1].pos = { pos.x - GetHalfWidth() + 257,pos.y - GetHalfHeight() + 57,0 };
+		uSkill[2].pos = { pos.x - GetHalfWidth() + 375,pos.y - GetHalfHeight() + 57,0 };
+		uSkill[3].pos = { pos.x - GetHalfWidth() + 500,pos.y - GetHalfHeight() + 60,0 };
+		for (INT i = 0; i < 10; i++)
+		{
+			uEnergy[i] = uEnergy[0];
+			uEnergy[i].texture = texture;
+			uEnergy[i].visible = TRUE;
+			uEnergy[i].pos = { pos.x - GetHalfWidth() + 507 + 33 * i, pos.y - GetHalfHeight() + 156,0 }; 
+		}
+		for (INT i = 0; i < 10; i++)
+		{
+			uHealth[i] = uHealth[0];
+			uHealth[i].texture = texture;
+			uHealth[i].visible = TRUE;
+			uHealth[i].pos = { pos.x - GetHalfWidth() + 102 + 33 * i, pos.y - GetHalfHeight() + 156,0 }; 
+		}
+	}
+
+	VOID SetHPnEP(std::pair<STATE, STATE> p)
+	{
+		STATE hp = p.first;
+		STATE ep = p.second;
+
+		for (INT i = 0; i < hp.max; i++)
+		{
+			if(i < hp.current)
+				uHealth[i].rect = { 0,400,36,400 + 36 };
+			else
+				uHealth[i].rect = { 0,450,36,450 + 36 };
+		}
+
+		for (INT i = 0; i < ep.max; i++)
+		{
+			if (i < ep.current)
+				uEnergy[i].rect = { 50,400,50 + 36,400 + 36 };
+			else
+				uEnergy[i].rect = { 50,450,50 + 36,460 + 36 };
+		}
+	}
+}P_UI;
 
 class ACTOR : public OBJECT
 {
 private:
 	TIME tOnHit;
-	INT maxHealth;
-	INT currentHealth;
+protected:
+	STATE health;
 	INT moveSpeed;
 
 public:
 	ACTOR() : OBJECT()
 	{
-		maxHealth = 1;
-		currentHealth = maxHealth;
+		health.max = 1;
+		health.current = health.max;
 		moveSpeed = 1;
 		tOnHit = TIME(60);
 	}
@@ -197,26 +277,28 @@ public:
 
 	INT GetHealth()
 	{
-		return currentHealth;
+		return health.current;
 	}
 
 	VOID AddHealth(INT value)
 	{
-		currentHealth += value;
+		if (health.current += value < health.max)
+			health.current = health.max;
 	}
 
 	VOID GetDamage(INT damage)
 	{
-		currentHealth -= damage;
+		if((health.current -= damage) < 0)
+			health.current = 0;
 		tOnHit.InitOltime();
 		
 	}
 
-	VOID Init(INT health,INT mSpeed)
+	VOID Init(INT hp, INT mSpeed)
 	{
 		moveSpeed = mSpeed;
-		maxHealth = health;
-		currentHealth = maxHealth;
+		health.max = hp;
+		health.current = health.max;
 	}
 	VOID ChangeColor()
 	{
@@ -290,6 +372,7 @@ public:
 class PLAYER : public ACTOR
 {
 private:
+	STATE energy;
 	BOOL isShoted;
 	INT attackType;
 	TIME tFiring;
@@ -298,21 +381,29 @@ private:
 	
 public:
 	BULLET bullet[100] = { BULLET(), };
-
+	P_UI ui = P_UI(0, 0, 1000, 180);
 	PLAYER(INT startPosX, INT startPosY, INT width, INT height) : ACTOR( startPosX, startPosY, width, height)
 	{
-		ACTOR::Init(100, 6);
+		ACTOR::Init(10, 6);
+		energy.max = 10;
+		energy.current = energy.max;
 		isShoted = FALSE;
 		attackType = 0;
 		tFiring = TIME(100);
 		tChangeT = TIME(1000);
 		tHitDelay = TIME(1000);
 	}
+
+	std::pair<STATE, STATE> GetHPnEP()
+	{
+		return { health , energy };
+	}
 	VOID GetDamage(INT damage);
 	VOID Control();
 	VOID OutedBorder();
 	VOID ShotBullet();
 	VOID ChangeAttackType();
+	VOID UIManager();
 };
 
 class ENEMY : public ACTOR
@@ -471,6 +562,10 @@ VOID PLAYER::ChangeAttackType()
 {
 	if (tChangeT.IsEnoughPassed(TRUE))
 		++attackType %= 4;
+}
+VOID PLAYER::UIManager() {
+	ui.SetHPnEP(GetHPnEP());
+	energy.current = 3;
 }
 
 // / ENEMY FUNCTION / //
