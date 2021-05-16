@@ -136,8 +136,6 @@ public:
 
 class UI : public OBJECT
 {
-private:
-	RECT image;
 public:
 	UI(){}
 	UI(INT startPosX, INT startPosY, INT width, INT height) : OBJECT(startPosX, startPosY, width, height)
@@ -146,16 +144,105 @@ public:
 	};
 };
 
+typedef class SKILL_UI : public UI
+{
+private:
+	BOOL isActive;
+	RECT actRect;
+	RECT unActRect;
+	INT costMana;
+	TIME tCooltime;
+public:
+	SKILL_UI(INT startPosX, INT startPosY, INT width, INT height) : UI(startPosX, startPosY, width, height)
+	{
+	}
+
+	VOID Init(LPDIRECT3DTEXTURE9 tex, INT i)
+	{
+		texture = tex;
+		visible = TRUE;
+		pos = { pos.x + FLOAT(144 + (i * 120) - GetHalfWidth()), pos.y + 55 - GetHalfHeight(), 0 };
+		actRect = rect;
+		unActRect = actRect;
+		unActRect.top += 100;
+		unActRect.bottom += 100;
+		switch (i)
+		{
+		case 0: 
+			tCooltime = TIME(1000);
+			costMana = 9;
+			break;
+		case 1:
+			tCooltime = TIME(1000);
+			costMana = 1;
+			break;
+		case 2:
+			tCooltime = TIME(3000);
+			costMana = 9;
+			break;
+		case 3:
+			tCooltime = TIME(5000);
+			costMana = 9;
+			break;
+		}
+	}
+
+	VOID ChangeImage(BOOL activation)
+	{
+		if (activation == TRUE)
+			rect = actRect;
+		else
+			rect = unActRect;
+	}
+	BOOL IsCooltime()
+	{
+		if (tCooltime.IsEnoughPassed(FALSE) == FALSE)
+		{
+			ChangeImage(FALSE);
+			return TRUE;
+		}
+		return FALSE;
+	}
+
+	BOOL IsLaskMana(INT mana)
+	{
+		if (mana - costMana < 0)
+		{
+			ChangeImage(FALSE);
+			return FALSE;
+		}
+		return TRUE;
+	}
+
+	BOOL IsUseable(INT mana)
+	{
+		if (IsCooltime() == TRUE || IsLaskMana(mana) == FALSE)
+			return FALSE;
+		if (tCooltime.IsEnoughPassed(FALSE) == FALSE) //false = ÄðÅ¸ÀÓ
+			ChangeImage(FALSE);
+		else
+			ChangeImage(TRUE);
+		return TRUE;
+	}
+	BOOL CanUse(INT mana)
+	{
+		if (IsLaskMana(mana) == FALSE || tCooltime.IsEnoughPassed(TRUE) == FALSE)
+			return FALSE;
+		return TRUE;
+	}
+}S_UI;
+
 typedef class PLAYER_UI : public UI
 {
 private:
-	UI uSkill[4] = { UI(0,200,64,57),UI(100,200,50,58),UI(200,200,45,47),UI(300,200,63,55) };
+	S_UI uSkill[4] = { S_UI(0,200,64,57),S_UI(100,200,50,58),S_UI(200,200,45,47),S_UI(300,200,63,55) };
 	UI uHealth[10] = { UI(0,400,36,36), };
 	UI uEnergy[10] = { UI(50, 400, 36, 36), };
+	INT* Pmana;
 public:
-	PLAYER_UI(INT startPosX, INT startPosY, INT width, INT height) : UI(startPosX, startPosY, width, height)
+	PLAYER_UI(INT startPosX, INT startPosY, INT width, INT height,INT* mana) : UI(startPosX, startPosY, width, height)
 	{
-
+		Pmana = mana;
 	};
 
 	VOID Draw()
@@ -172,9 +259,7 @@ public:
 	{
 		for (INT i = 0; i < 4; i++)
 		{
-			uSkill[i].texture = texture;
-			uSkill[i].visible = TRUE;
-			uSkill[i].pos = { pos.x + FLOAT(144 + (i * 120) - GetHalfWidth()), pos.y + 55 - GetHalfHeight(), 0 };
+			uSkill[i].Init(texture, i);
 		}
 		uSkill[0].pos = { pos.x - GetHalfWidth() + 144,pos.y - GetHalfHeight() + 57,0 };
 		uSkill[1].pos = { pos.x - GetHalfWidth() + 257,pos.y - GetHalfHeight() + 57,0 };
@@ -215,6 +300,19 @@ public:
 				uEnergy[i].rect = { 50,400,50 + 36,400 + 36 };
 			else
 				uEnergy[i].rect = { 50,450,50 + 36,460 + 36 };
+		}
+	}
+
+	BOOL IsCanPlay(INT num)
+	{
+		return uSkill[num - 1].CanUse(*Pmana);
+	}
+
+	VOID ManagedSkillCooltime()
+	{
+		for (INT i = 0; i < 4; i++)
+		{
+			uSkill[i].IsUseable(*Pmana);
 		}
 	}
 }P_UI;
@@ -376,12 +474,11 @@ private:
 	BOOL isShoted;
 	INT attackType;
 	TIME tFiring;
-	TIME tChangeT;
 	TIME tHitDelay;
 	
 public:
 	BULLET bullet[100] = { BULLET(), };
-	P_UI ui = P_UI(0, 0, 1000, 180);
+	P_UI ui = P_UI(0, 0, 1000, 180,&(energy.current));
 	PLAYER(INT startPosX, INT startPosY, INT width, INT height) : ACTOR( startPosX, startPosY, width, height)
 	{
 		ACTOR::Init(10, 6);
@@ -390,7 +487,6 @@ public:
 		isShoted = FALSE;
 		attackType = 0;
 		tFiring = TIME(100);
-		tChangeT = TIME(1000);
 		tHitDelay = TIME(1000);
 	}
 
@@ -533,6 +629,8 @@ VOID PLAYER::Control()
 	if (KEY_DOWN(INT('S')))
 		AddEnemy(2);
 	ChangeColor();
+
+	ui.ManagedSkillCooltime();
 }
 VOID PLAYER::OutedBorder()
 {
@@ -560,12 +658,15 @@ VOID PLAYER::ShotBullet()
 }
 VOID PLAYER::ChangeAttackType()
 {
-	if (tChangeT.IsEnoughPassed(TRUE))
+
+	//if (tChangeT.IsEnoughPassed(TRUE) == FALSE)
+	if (ui.IsCanPlay(2)) {
 		++attackType %= 4;
+		energy.current -= 1;
+	}
 }
 VOID PLAYER::UIManager() {
 	ui.SetHPnEP(GetHPnEP());
-	energy.current = 3;
 }
 
 // / ENEMY FUNCTION / //
