@@ -170,7 +170,7 @@ public:
 		{
 		case 0: 
 			tCooltime = TIME(1000);
-			costMana = 9;
+			costMana = 2;
 			break;
 		case 1:
 			tCooltime = TIME(1000);
@@ -178,11 +178,11 @@ public:
 			break;
 		case 2:
 			tCooltime = TIME(3000);
-			costMana = 9;
+			costMana = 3;
 			break;
 		case 3:
 			tCooltime = TIME(5000);
-			costMana = 9;
+			costMana = 3;
 			break;
 		}
 	}
@@ -203,7 +203,6 @@ public:
 		}
 		return FALSE;
 	}
-
 	BOOL IsLaskMana(INT mana)
 	{
 		if (mana - costMana < 0)
@@ -213,7 +212,6 @@ public:
 		}
 		return TRUE;
 	}
-
 	BOOL IsUseable(INT mana)
 	{
 		if (IsCooltime() == TRUE || IsLaskMana(mana) == FALSE)
@@ -229,6 +227,10 @@ public:
 		if (IsLaskMana(mana) == FALSE || tCooltime.IsEnoughPassed(TRUE) == FALSE)
 			return FALSE;
 		return TRUE;
+	}
+	INT GetCost()
+	{
+		return costMana;
 	}
 }S_UI;
 
@@ -314,6 +316,11 @@ public:
 		{
 			uSkill[i].IsUseable(*Pmana);
 		}
+	}
+
+	INT GetSkillCost(INT num)
+	{
+		return uSkill[num - 1].GetCost();
 	}
 }P_UI;
 
@@ -498,7 +505,11 @@ public:
 	VOID Control();
 	VOID OutedBorder();
 	VOID ShotBullet();
+	VOID UseEnergy(INT value);
+	VOID PlusMoveSpeed();
 	VOID ChangeAttackType();
+	VOID GuardAround();
+	VOID Heal();
 	VOID UIManager();
 };
 
@@ -624,6 +635,8 @@ VOID PLAYER::Control()
 		ShotBullet();
 	if (KEY_DOWN(INT('X')))
 		ChangeAttackType();
+	if (KEY_DOWN(INT('V')))
+		Heal();
 	if (KEY_DOWN(INT('A')))
 		AddEnemy(1);
 	if (KEY_DOWN(INT('S')))
@@ -640,6 +653,12 @@ VOID PLAYER::OutedBorder()
 		ACTOR::GetDamage(1);
 		pos.x = GetHalfWidth() + 30;
 	}
+}
+VOID PLAYER::UseEnergy(INT value)
+{
+	if (energy.current - value < 0)
+		return;
+	energy.current -= value;
 }
 VOID PLAYER::ShotBullet()
 {
@@ -658,12 +677,20 @@ VOID PLAYER::ShotBullet()
 }
 VOID PLAYER::ChangeAttackType()
 {
-
-	//if (tChangeT.IsEnoughPassed(TRUE) == FALSE)
 	if (ui.IsCanPlay(2)) {
 		++attackType %= 4;
-		energy.current -= 1;
+		UseEnergy(ui.GetSkillCost(2));
 	}
+}
+VOID PLAYER::Heal()
+{
+	if (health.current < health.max == FALSE)
+		return;
+		if (ui.IsCanPlay(4))
+		{
+			health.current++;
+			UseEnergy(ui.GetSkillCost(4));
+		}
 }
 VOID PLAYER::UIManager() {
 	ui.SetHPnEP(GetHPnEP());
