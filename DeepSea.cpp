@@ -252,7 +252,7 @@ VOID EnemyUpdate()
 
 VOID AddEnemy(INT type)
 {
-    FLOAT yPos; 
+    FLOAT yPos = 0.f; 
     ENEMY e;
     switch (type)
     {

@@ -4,20 +4,30 @@ C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(95,37): warning C4458:
 C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(65,21): message : 'OBJECT::texture' 선언을 참조하십시오.
 C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(102,16): warning C4244: 'return': 'float'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(106,16): warning C4244: 'return': 'float'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(603,29): warning C4458: 'type' 선언은 클래스 멤버를 숨깁니다.
-C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(455,7): message : 'BULLET::type' 선언을 참조하십시오.
-C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(654,26): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(720,75): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(720,48): warning C4244: '인수': 'double'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(723,31): warning C4244: '인수': 'double'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(729,22): warning C4458: 'type' 선언은 클래스 멤버를 숨깁니다.
-C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(519,6): message : 'ENEMY::type' 선언을 참조하십시오.
-C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(737,22): warning C4244: '=': 'double'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(738,24): warning C4244: '=': 'double'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(739,24): warning C4244: '=': 'double'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(160,1): warning C4458: 'isActive' 선언은 클래스 멤버를 숨깁니다.
+C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(155,7): message : 'SKILL_UI::isActive' 선언을 참조하십시오.
+C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(161,1): warning C4458: 'actRect' 선언은 클래스 멤버를 숨깁니다.
+C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(150,7): message : 'SKILL_UI::actRect' 선언을 참조하십시오.
+C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(162,1): warning C4458: 'unActRect' 선언은 클래스 멤버를 숨깁니다.
+C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(151,7): message : 'SKILL_UI::unActRect' 선언을 참조하십시오.
+C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(163,1): warning C4458: 'costMana' 선언은 클래스 멤버를 숨깁니다.
+C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(152,6): message : 'SKILL_UI::costMana' 선언을 참조하십시오.
+C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(160,8): warning C4189: 'isActive': 지역 변수가 초기화되었으나 참조되지 않았습니다.
+C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(163,7): warning C4189: 'costMana': 지역 변수가 초기화되었으나 참조되지 않았습니다.
+C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(339,42): warning C4390: ';': 제어된 빈 문이 있습니다. 이 문이 필요합니까?
+C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(348,44): warning C4390: ';': 제어된 빈 문이 있습니다. 이 문이 필요합니까?
+C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(643,29): warning C4458: 'type' 선언은 클래스 멤버를 숨깁니다.
+C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(493,7): message : 'BULLET::type' 선언을 참조하십시오.
+C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(696,26): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(787,79): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(790,31): warning C4244: '인수': 'double'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(796,22): warning C4458: 'type' 선언은 클래스 멤버를 숨깁니다.
+C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(559,6): message : 'ENEMY::type' 선언을 참조하십시오.
+C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(804,22): warning C4244: '=': 'double'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(805,24): warning C4244: '=': 'double'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\gameData.h(806,24): warning C4244: '=': 'double'에서 'INT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\DeepSea.cpp(159,43): warning C4244: '=': 'INT'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\DeepSea.cpp(260,37): warning C4244: '=': 'double'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\DeepSea.cpp(264,37): warning C4244: '=': 'double'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\DeepSea.cpp(267,12): warning C4102: 'defualt': 참조되지 않은 레이블입니다.
-C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\DeepSea.cpp(272): warning C4701: 초기화되지 않았을 수 있는 'yPos' 지역 변수를 사용했습니다.
   DeepSea_2010.vcxproj -> C:\Users\Test\Desktop\Coding\4.DirectX\DeepSea\Debug\DeepSea.exe

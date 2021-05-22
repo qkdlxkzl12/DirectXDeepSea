@@ -147,14 +147,20 @@ public:
 typedef class SKILL_UI : public UI
 {
 private:
-	BOOL isActive;
 	RECT actRect;
 	RECT unActRect;
 	INT costMana;
 	TIME tCooltime;
+	//활성화 스킬 관련 변수
+	BOOL isActive;
+	TIME tActive;
 public:
 	SKILL_UI(INT startPosX, INT startPosY, INT width, INT height) : UI(startPosX, startPosY, width, height)
 	{
+		BOOL isActive = FALSE;
+		RECT actRect = {0,};
+		RECT unActRect{0,};
+		INT costMana = 0;
 	}
 
 	VOID Init(LPDIRECT3DTEXTURE9 tex, INT i)
@@ -169,8 +175,10 @@ public:
 		switch (i)
 		{
 		case 0: 
-			tCooltime = TIME(1000);
+			tCooltime = TIME(5000);
 			costMana = 2;
+			tActive = TIME(5000);
+			isActive = TRUE;
 			break;
 		case 1:
 			tCooltime = TIME(1000);
@@ -179,6 +187,8 @@ public:
 		case 2:
 			tCooltime = TIME(3000);
 			costMana = 3;
+			tActive = TIME(3000);
+			isActive = TRUE;
 			break;
 		case 3:
 			tCooltime = TIME(5000);
@@ -196,6 +206,9 @@ public:
 	}
 	BOOL IsCooltime()
 	{
+		if (isActive == TRUE)
+			if (tActive.IsEnoughPassed(FALSE) == FALSE)
+				tCooltime.InitOltime();
 		if (tCooltime.IsEnoughPassed(FALSE) == FALSE)
 		{
 			ChangeImage(FALSE);
@@ -231,6 +244,20 @@ public:
 	INT GetCost()
 	{
 		return costMana;
+	}
+	BOOL IsActive()
+	{
+		//액티브 스킬이 아니면 return
+		if (isActive == FALSE)
+			return FALSE;
+		//활성화 되어있으면 쿨타임 줄지 않기 위해
+		if (tActive.IsEnoughPassed(FALSE) == FALSE)
+				tCooltime.InitOltime();
+		return tActive.IsEnoughPassed(FALSE);
+	}
+	VOID InitActive()
+	{
+		tActive.InitOltime();
 	}
 }S_UI;
 
@@ -307,6 +334,10 @@ public:
 
 	BOOL IsCanPlay(INT num)
 	{
+		if (num < 0 || num > 4)
+			return FALSE;
+		if (uSkill[num - 1].IsActive() == TRUE);
+			uSkill[num -1].InitActive();
 		return uSkill[num - 1].CanUse(*Pmana);
 	}
 
@@ -314,10 +345,17 @@ public:
 	{
 		for (INT i = 0; i < 4; i++)
 		{
-			uSkill[i].IsUseable(*Pmana);
+			if (uSkill[i].IsUseable(*Pmana) == TRUE);
 		}
 	}
 
+	BOOL IsFinishedActive(INT num)
+	{
+		if (num < 0 || num > 4)
+			return FALSE;	
+		return uSkill[num].IsActive();
+		// ? 지속 시간 경과 : 발동 중 
+	}
 	INT GetSkillCost(INT num)
 	{
 		return uSkill[num - 1].GetCost();
@@ -482,7 +520,9 @@ private:
 	INT attackType;
 	TIME tFiring;
 	TIME tHitDelay;
-	
+	// 스킬 관련 변수
+	BOOL isFastMode = FALSE;
+	BOOL isGuardMode = FALSE;
 public:
 	BULLET bullet[100] = { BULLET(), };
 	P_UI ui = P_UI(0, 0, 1000, 180,&(energy.current));
@@ -494,7 +534,7 @@ public:
 		isShoted = FALSE;
 		attackType = 0;
 		tFiring = TIME(100);
-		tHitDelay = TIME(1000);
+		tHitDelay = TIME(666);
 	}
 
 	std::pair<STATE, STATE> GetHPnEP()
@@ -633,6 +673,8 @@ VOID PLAYER::Control()
 			MoveDown();
 	if (KEY_DOWN(VK_SPACE))
 		ShotBullet();
+	if (KEY_DOWN(INT('Z')))
+		PlusMoveSpeed();
 	if (KEY_DOWN(INT('X')))
 		ChangeAttackType();
 	if (KEY_DOWN(INT('V')))
@@ -675,16 +717,28 @@ VOID PLAYER::ShotBullet()
 			break;
 	}
 }
+VOID PLAYER::PlusMoveSpeed()
+{
+	if (ui.IsCanPlay(1) == FALSE)
+		return;
+	isFastMode = TRUE;
+}
 VOID PLAYER::ChangeAttackType()
 {
-	if (ui.IsCanPlay(2)) {
-		++attackType %= 4;
-		UseEnergy(ui.GetSkillCost(2));
-	}
+	if (ui.IsCanPlay(2) == FALSE)
+		return;
+	++attackType %= 4;
+	UseEnergy(ui.GetSkillCost(2));
+}
+VOID PLAYER::GuardAround() 
+{
+	if (ui.IsCanPlay(3) == FALSE)
+		return;
+
 }
 VOID PLAYER::Heal()
 {
-	if (health.current < health.max == FALSE)
+	if ((health.current < health.max) == FALSE)
 		return;
 		if (ui.IsCanPlay(4))
 		{
@@ -694,6 +748,19 @@ VOID PLAYER::Heal()
 }
 VOID PLAYER::UIManager() {
 	ui.SetHPnEP(GetHPnEP());
+	for (INT i = 0; i < 4; i++)
+		if (ui.IsFinishedActive(i) == TRUE)
+			switch (i)
+			{
+			case 1: isFastMode = FALSE;
+				break;
+			case 3: isGuardMode = FALSE;
+				break;
+			}
+		else
+		{
+
+		}
 }
 
 // / ENEMY FUNCTION / //
@@ -717,7 +784,7 @@ VOID ENEMY::Move()
 	switch (type)
 	{
 	case 1:
-		MoveUp(movementSize / (0.1 * movementValue1) * sinf( 0.1 / movementSize * pos.x));
+		MoveUp(INT(movementSize / (0.1 * movementValue1) * sinf( 0.1 / movementSize * pos.x)));
 		break;
 	case 2:
 		MoveUp(0.001 * movementSize * pos.x);
