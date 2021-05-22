@@ -175,7 +175,7 @@ public:
 		switch (i)
 		{
 		case 0: 
-			tCooltime = TIME(5000);
+			tCooltime = TIME(1000);
 			costMana = 2;
 			tActive = TIME(5000);
 			isActive = TRUE;
@@ -353,7 +353,7 @@ public:
 	{
 		if (num < 0 || num > 4)
 			return FALSE;	
-		return uSkill[num].IsActive();
+		return uSkill[num - 1].IsActive();
 		// ? 지속 시간 경과 : 발동 중 
 	}
 	INT GetSkillCost(INT num)
@@ -521,6 +521,7 @@ private:
 	TIME tFiring;
 	TIME tHitDelay;
 	// 스킬 관련 변수
+	INT oMoveSpeed;
 	BOOL isFastMode = FALSE;
 	BOOL isGuardMode = FALSE;
 public:
@@ -529,6 +530,7 @@ public:
 	PLAYER(INT startPosX, INT startPosY, INT width, INT height) : ACTOR( startPosX, startPosY, width, height)
 	{
 		ACTOR::Init(10, 6);
+		oMoveSpeed = moveSpeed;
 		energy.max = 10;
 		energy.current = energy.max;
 		isShoted = FALSE;
@@ -722,6 +724,7 @@ VOID PLAYER::PlusMoveSpeed()
 	if (ui.IsCanPlay(1) == FALSE)
 		return;
 	isFastMode = TRUE;
+	UseEnergy(ui.GetSkillCost(1));
 }
 VOID PLAYER::ChangeAttackType()
 {
@@ -757,10 +760,11 @@ VOID PLAYER::UIManager() {
 			case 3: isGuardMode = FALSE;
 				break;
 			}
-		else
-		{
-
-		}
+	if (isFastMode == TRUE)
+		moveSpeed = oMoveSpeed * 2.0f;
+	else
+		moveSpeed = oMoveSpeed;
+	if (isGuardMode == TRUE);
 }
 
 // / ENEMY FUNCTION / //
